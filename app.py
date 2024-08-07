@@ -1,16 +1,43 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ExifTags
 
+# 가장 먼저 set_page_config() 호출
+st.set_page_config(page_title="Deepfake Prevention Filter (Test)", layout="wide")
 
-st.set_page_config(page_title="Image Processing MVP", layout="wide")
-st.title("Image Processing MVP")
-st.markdown("When you upload your image, our protective filter will be applied to ensure it is not used as training data for deepfake purposes")
-st.markdown("Please, no refresh")
+# 나머지 Streamlit 코드
+st.title("Deepfake Prevention Filter (Test)")
+st.markdown("")
+st.markdown("<span style='font-size: 18px;'>Hello! We are developing a solution to protect your photos from deepfakes.</span>", unsafe_allow_html=True)
+st.markdown("<span style='font-size: 18px;'>Our goal is to prevent personal photos posted online from being used in malicious deepfake videos. Before our official launch, we are conducting a simple test to gather your feedback.</span>", unsafe_allow_html=True)
+st.markdown("<span style='font-size: 18px;'>Recently, there have been daily reports of images uploaded to social media being misused for deepfakes. Therefore, we need your valuable opinions to find a solution.</span>", unsafe_allow_html=True)
+st.markdown("")
+st.markdown("<span style='font-size: 18px;'>Process 1. Upload a photo of yourself, and we will display the image with the applied prevention filter. (Your image will not be stored!)</span>", unsafe_allow_html=True)
+st.markdown("<span style='font-size: 18px;'>Process 2. Click the deepfake simulation button to view the results.</span>", unsafe_allow_html=True)
+st.markdown("<span style='font-size: 18px;'>Thank you for your participation!!</span>", unsafe_allow_html=True)
+st.markdown("<span style='font-size: 14px;'> *Prevention filter: A filter that makes subtle changes to the photo to hinder it from being learned by deepfake models.</span>", unsafe_allow_html=True)
 st.markdown(
     """
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
+    /* 공통 스타일 */
+    .stFileUploader label,
+    .stRadio label,
+    .stRadio div,
+    .custom-caption-1,
+    .custom-caption-2,
+    .custom-caption-3,
+    .button-container,
+    .stButton button,
+    .survey,
+    .survey-1,
+    .survey-2,
+    .a-tag,
+    a {
+        transition: all 0.3s ease;
+    }
     .stFileUploader label {
         font-size: 20px;
         font-weight: 500;
@@ -35,6 +62,13 @@ st.markdown(
     .custom-caption-2 {
         font-size: 36px;
         font-weight: bold;
+        text-align: center;
+        margin-top: 10px;
+        padding: 0 0 30px 0;
+    }
+    .custom-caption-3 {
+        font-size: 30px;
+        # font-weight: bold;
         text-align: center;
         margin-top: 10px;
         padding: 0 0 30px 0;
@@ -87,11 +121,33 @@ st.markdown(
         color: #FF0080;
         text-decoration: none;
     }
+    
+    /* 스마트폰 화면 스타일 */
+    @media only screen and (max-width: 600px) {
+        .stFileUploader label,
+        .stRadio label,
+        .stButton button,
+        .survey-1 {
+            font-size: 16px;
+        }
+        .custom-caption-1,
+        .custom-caption-2 {
+            font-size: 24px;
+            padding: 0 0 20px 0;
+        }
+        .custom-caption-3 {
+            font-size: 20px;
+            padding: 0 0 20px 0;
+        }
+        .stButton button {
+            width: 100%;
+            font-size: 18px;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
-
 
 def change_hair_to_blonde(image):
     # Convert to OpenCV format
@@ -122,11 +178,29 @@ def add_noise(image):
     noisy_image = cv2.add(image_np, noise)
     return noisy_image
 
+def correct_image_orientation(image):
+    try:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+        exif = image._getexif()
+        if exif is not None:
+            orientation = exif.get(orientation, 1)
+            if orientation == 3:
+                image = image.rotate(180, expand=True)
+            elif orientation == 6:
+                image = image.rotate(270, expand=True)
+            elif orientation == 8:
+                image = image.rotate(90, expand=True)
+    except (AttributeError, KeyError, IndexError):
+        pass
+    return image
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader("Upload your Image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
+    image = correct_image_orientation(image)
     
     st.write("Processing...")
 
@@ -137,30 +211,43 @@ if uploaded_file is not None:
     
     with col1:
         st.image(image, use_column_width=True)
-        st.markdown('<div class="custom-caption-1">Upload Image</div>', unsafe_allow_html=True)
+        st.markdown('<div class="custom-caption-1">Original image uploaded</div>', unsafe_allow_html=True)
 
     with col2:
         st.image(image, use_column_width=True)
-        st.markdown('<div class="custom-caption-1">Processed Image</div>', unsafe_allow_html=True)
+        st.markdown('<div class="custom-caption-1">Image with applied filter</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="custom-caption-1">The image with the applied filter shows no significant difference to the naked eye.</div>', unsafe_allow_html=True)
 
-
-
-
-    button_clicked = st.button("Put Upper Pictures into Deepfake Model")
-    st.markdown('<p class="survey">If you have used this feature or curious about our technical principles, we would appreciate it if you could respond to the survey below.</p>', unsafe_allow_html=True)
-    st.markdown('<p class="survey">We will be giving out gift cards through a monthly raffle among those who leave their contact information.</p>', unsafe_allow_html=True)
-    st.markdown('<p class="survey-1"><a href="https://docs.google.com/forms/d/e/1FAIpQLSdzRtuvQyp3CQDhlxEag40v2yDM7u9NYpJ2gv5kgwuNbo1gUA/viewform?usp=sf_link" target="_blank" class="a-tag">Participate in this Survey would help us!!</a></p>', unsafe_allow_html=True)
-    st.markdown('<p class="survey-2">Thank you for using our service!!</p>', unsafe_allow_html=True)
-
+    button_clicked = st.button("Apply Deepfake Model")
+    
+    col3, col4 = st.columns(2)
+    
     if button_clicked:
-        with col1:
-            processed_image = change_hair_to_blonde(image)
+        processed_image = change_hair_to_blonde(image)
+        deepfake_image = add_noise(image)
+    else:
+        processed_image = None
+        deepfake_image = None
+
+    if processed_image is not None and deepfake_image is not None:
+        with col3:
             st.image(processed_image, use_column_width=True)
-            st.markdown('<div class="custom-caption-2">Upload Image Deepfake Output</div>', unsafe_allow_html=True)
+            st.markdown('<div class="custom-caption-2">Deepfake created from original image</div>', unsafe_allow_html=True)
+            st.markdown('<div class="custom-caption-3">To illustrate, a deepfake algorithm that applies a yellow tint to the photo has been used. The original image will turn yellow due to the effect of the deepfake algorithm.</div>', unsafe_allow_html=True)
         
-        with col2:
-            deepfake_image = add_noise(image)
+        with col4:
             st.image(deepfake_image, use_column_width=True)
-            st.markdown('<div class="custom-caption-2">Processed Image Deepfake Output</div>', unsafe_allow_html=True)
-            
-            
+            st.markdown('<div class="custom-caption-2">Deepfake created from applied filter</div>', unsafe_allow_html=True)
+            st.markdown('<div class="custom-caption-3">The image with the prevention filter applied is protected from deepfake effects and produces a photo that is difficult to recognize.</div>', unsafe_allow_html=True)
+        
+        st.markdown('<p class="survey"></p>', unsafe_allow_html=True)
+        st.markdown('<p class="survey-1" class="a-tag">alsghksdl2827@gmail.com</a></p>', unsafe_allow_html=True)
+        st.markdown('<p class="survey-2">Thank you for using our service! Have a great day!</p>', unsafe_allow_html=True)
+        
+        # Clicky script integration using components.html
+        clicky_code = """
+        <script async data-id="101461011" src="//static.getclicky.com/js"></script>
+        <noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101461011ns.gif" /></p></noscript>
+        """
+        components.html(clicky_code, height=0)
