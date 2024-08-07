@@ -239,12 +239,14 @@ if uploaded_file is not None:
             st.markdown('<div class="custom-caption-3">The image with the prevention filter applied is protected from deepfake effects and produces a photo that is difficult to recognize.</div>', unsafe_allow_html=True)
         
         st.markdown('<p class="survey">If you have used similar services or are interested in our technological principles, please contact us at the email address below. We would be very grateful!</p>', unsafe_allow_html=True)
-        st.markdown('<p class="survey-1">alsghksdl2827@gmail.com</a></p>', unsafe_allow_html=True)
+        st.markdown('<p class="survey-1">alsghksdl2827@gmail.com</p>', unsafe_allow_html=True)
         st.markdown('<p class="survey-2">Thank you for using our service! Have a great day!</p>', unsafe_allow_html=True)
         
         # Clicky script integration using components.html
         clicky_code = """
-        <script async data-id="101461011" src="//static.getclicky.com/js"></script>
-        <noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101461011ns.gif" /></p></noscript>
+        <a title="Web Analytics" href="https://clicky.com/101461208">
+            <img alt="Clicky" src="//static.getclicky.com/media/links/badge.gif" border="0" />
+        </a>
+        <script async data-id="101461208" src="//static.getclicky.com/js"></script>
         """
         components.html(clicky_code, height=0)
