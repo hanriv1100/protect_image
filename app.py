@@ -106,16 +106,13 @@ st.markdown(
         text-align: center;
         margin-top: 10px
         font-weight: bold;
+        color: #FF0080;
     }
     .survey-2 {
         text-align: center;
         margin-top: 10px
         font-weight: bold;
         padding 0 auto 50px auto
-    }
-    .a-tag {
-        color: #FF0080;
-        text-decoration: none;
     }
     a:hover {
         color: #FF0080;
@@ -241,8 +238,8 @@ if uploaded_file is not None:
             st.markdown('<div class="custom-caption-2">Deepfake created from applied filter</div>', unsafe_allow_html=True)
             st.markdown('<div class="custom-caption-3">The image with the prevention filter applied is protected from deepfake effects and produces a photo that is difficult to recognize.</div>', unsafe_allow_html=True)
         
-        st.markdown('<p class="survey"></p>', unsafe_allow_html=True)
-        st.markdown('<p class="survey-1" class="a-tag">alsghksdl2827@gmail.com</a></p>', unsafe_allow_html=True)
+        st.markdown('<p class="survey">If you have used similar services or are interested in our technological principles, please contact us at the email address below. We would be very grateful!</p>', unsafe_allow_html=True)
+        st.markdown('<p class="survey-1">alsghksdl2827@gmail.com</a></p>', unsafe_allow_html=True)
         st.markdown('<p class="survey-2">Thank you for using our service! Have a great day!</p>', unsafe_allow_html=True)
         
         # Clicky script integration using components.html
